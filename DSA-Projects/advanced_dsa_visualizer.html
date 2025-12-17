@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced DSA Visualizer</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: #fff;
+    text-align: center;
+  }
+
+  h2 {
+    margin-top: 20px;
+    font-size: 28px;
+  }
+
+  p {
+    opacity: 0.8;
+  }
+
+  .controls {
+    margin: 20px 0;
+  }
+
+  button {
+    background: #38bdf8;
+    border: none;
+    padding: 10px 16px;
+    margin: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background: #0ea5e9;
+    transform: scale(1.05);
+  }
+
+  canvas {
+    background: #020617;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(56,189,248,0.5);
+    margin-bottom: 20px;
+  }
+
+  footer {
+    opacity: 0.6;
+    margin-bottom: 15px;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>Advanced Data Structure & Algorithm Visualizer</h2>
+<p>Sorting • Searching • Graph Traversal</p>
+
+<div class="controls">
+  <button onclick="generateArray()">Generate Array</button>
+  <button onclick="bubbleSort()">Bubble Sort</button>
+  <button onclick="linearSearch()">Linear Search</button>
+  <button onclick="dfs()">DFS Traversal</button>
+  <button onclick="resetCanvas()">Reset</button>
+</div>
+
+<canvas id="canvas" width="900" height="350"></canvas>
+
+<footer>DSA Visualization using HTML • CSS • JavaScript</footer>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let arr = [];
+const barWidth = 40;
+
+// ---------- DRAW ARRAY ----------
+function drawArray(highlight = -1) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = "14px Arial";
+
+  arr.forEach((value, index) => {
+    const x = index * (barWidth + 10) + 40;
+    const height = value * 2;
+    const y = canvas.height - height - 20;
+
+    ctx.fillStyle = index === highlight ? "#ef4444" : "#22c55e";
+    ctx.fillRect(x, y, barWidth, height);
+
+    ctx.fillStyle = "#fff";
+    ctx.fillText(value, x + 8, y - 5);
+  });
+}
+
+// ---------- GENERATE ARRAY ----------
+function generateArray() {
+  arr = Array.from({ length: 15 }, () => Math.floor(Math.random() * 100) + 10);
+  drawArray();
+}
+
+// ---------- BUBBLE SORT ----------
+function bubbleSort() {
+  let i = 0, j = 0;
+
+  const interval = setInterval(() => {
+    if (i < arr.length) {
+      if (j < arr.length - i - 1) {
+        if (arr[j] > arr[j + 1]) {
+          [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+        }
+        drawArray(j);
+        j++;
+      } else {
+        j = 0;
+        i++;
+      }
+    } else {
+      clearInterval(interval);
+      drawArray();
+    }
+  }, 200);
+}
+
+// ---------- LINEAR SEARCH ----------
+function linearSearch() {
+  if (arr.length === 0) return;
+
+  const target = arr[Math.floor(Math.random() * arr.length)];
+  let i = 0;
+
+  const interval = setInterval(() => {
+    if (i < arr.length) {
+      drawArray(i);
+      if (arr[i] === target) {
+        clearInterval(interval);
+      }
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 200);
+}
+
+// ---------- DFS GRAPH ----------
+const graph = {
+  A: ["B", "C"],
+  B: ["D", "E"],
+  C: ["F"],
+  D: [],
+  E: [],
+  F: []
+};
+
+function dfs() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = "16px Arial";
+
+  let visited = {};
+  let y = 60;
+
+  function visit(node) {
+    visited[node] = true;
+
+    ctx.fillStyle = "#38bdf8";
+    ctx.beginPath();
+    ctx.arc(120, y, 18, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#000";
+    ctx.fillText(node, 115, y + 5);
+
+    y += 50;
+
+    graph[node].forEach(n => {
+      if (!visited[n]) visit(n);
+    });
+  }
+
+  visit("A");
+}
+
+// ---------- RESET ----------
+function resetCanvas() {
+  arr = [];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+</script>
+
+</body>
+</html>
