@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tree Visualizer (BST & Max Heap)</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: #fff;
+    text-align: center;
+  }
+  h2 { margin-top: 20px; }
+  input, button {
+    margin: 5px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    font-size: 14px;
+  }
+  button {
+    background: #38bdf8;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover { background: #0ea5e9; transform: scale(1.05); }
+  canvas {
+    background: #020617;
+    border-radius: 10px;
+    margin-top: 20px;
+    box-shadow: 0 0 20px rgba(56,189,248,0.5);
+  }
+</style>
+</head>
+<body>
+
+<h2>Binary Search Tree & Max Heap Visualizer</h2>
+<input type="number" id="value" placeholder="Enter value">
+<button onclick="insertBST()">Insert BST</button>
+<button onclick="insertHeap()">Insert Max Heap</button>
+<button onclick="resetTree()">Reset</button>
+
+<canvas id="canvas" width="900" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let bst = null;
+let heap = [];
+
+// ---------- NODE CLASS ----------
+class Node {
+  constructor(val) { this.val = val; this.left = null; this.right = null; }
+}
+
+// ---------- BST ----------
+function insertBST() {
+  const val = parseInt(document.getElementById('value').value);
+  if (isNaN(val)) return;
+  bst = insertNode(bst, val);
+  drawBST();
+}
+
+function insertNode(root, val) {
+  if (!root) return new Node(val);
+  if (val < root.val) root.left = insertNode(root.left, val);
+  else root.right = insertNode(root.right, val);
+  return root;
+}
+
+function drawBST() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawBSTNode(bst, canvas.width/2, 40, 180);
+}
+
+function drawBSTNode(node, x, y, gap) {
+  if (!node) return;
+
+  // Draw edges first
+  if(node.left) {
+    ctx.strokeStyle = "#38bdf8";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x-gap, y+60);
+    ctx.stroke();
+    drawBSTNode(node.left, x-gap, y+60, gap/1.5);
+  }
+  if(node.right) {
+    ctx.strokeStyle = "#38bdf8";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x+gap, y+60);
+    ctx.stroke();
+    drawBSTNode(node.right, x+gap, y+60, gap/1.5);
+  }
+
+  // Draw node
+  ctx.fillStyle = "#38bdf8";
+  ctx.beginPath();
+  ctx.arc(x, y, 20, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = "#fff";
+  ctx.stroke();
+
+  ctx.fillStyle = "#000";
+  ctx.font = "16px Arial";
+  ctx.fillText(node.val, x-6, y+5);
+}
+
+// ---------- MAX HEAP ----------
+function insertHeap() {
+  const val = parseInt(document.getElementById('value').value);
+  if (isNaN(val)) return;
+  heap.push(val);
+  bubbleUp(heap.length-1);
+  drawHeap();
+}
+
+function bubbleUp(i) {
+  while(i > 0){
+    const p = Math.floor((i-1)/2);
+    if(heap[p] < heap[i]){
+      [heap[p], heap[i]] = [heap[i], heap[p]];
+      i = p;
+    } else break;
+  }
+}
+
+function drawHeap() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const pos = [];
+  heap.forEach((val,i)=>{
+    const level = Math.floor(Math.log2(i+1));
+    const index = i - (2**level-1);
+    const nodesInLevel = 2**level;
+    const gap = canvas.width/(nodesInLevel+1);
+    const x = gap*(index+1);
+    const y = 50 + level*80;
+    pos[i] = {x,y};
+
+    if(i>0){ // draw parent line
+      const parent = Math.floor((i-1)/2);
+      ctx.strokeStyle="#facc15";
+      ctx.beginPath();
+      ctx.moveTo(x,y);
+      ctx.lineTo(pos[parent].x,pos[parent].y);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle="#facc15";
+    ctx.beginPath();
+    ctx.arc(x,y,20,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle="#fff";
+    ctx.stroke();
+
+    ctx.fillStyle="#000";
+    ctx.font="16px Arial";
+    ctx.fillText(val,x-7,y+5);
+  });
+}
+
+// ---------- RESET ----------
+function resetTree() {
+  bst=null;
+  heap=[];
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+</script>
+
+</body>
+</html>
